@@ -7,6 +7,10 @@ socket即套接字，能够唯一确定通信双方。（一般是客户端和�
 
 > * **socket API是位于应用层和传输层之间**
 
+![tcpip五层模型.jpg](https://upload-images.jianshu.io/upload_images/18154407-1a0fb2cb4b36a3c1.jpg?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
+
+[看不到图片点这](https://upload-images.jianshu.io/upload_images/18154407-1a0fb2cb4b36a3c1.jpg?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)（我要研究下怎么把图片放到github）
+
 ## 创建套接字
 ```c
 int socket(int domain, int type, int protocol);
@@ -237,3 +241,4 @@ msg name : 测试
 ```
 ---
 2020.3.2 17:03 广州
+
