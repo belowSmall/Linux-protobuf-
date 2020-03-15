@@ -7,9 +7,8 @@ socket即套接字，能够唯一确定通信双方。（一般是客户端和�
 
 > * **socket API是位于应用层和传输层之间**
 
-
 ## 创建套接字
-```
+```c
 int socket(int domain, int type, int protocol);
 ```
 第一个参数：```domain``` 在英文里是“域”的意思。这里约定的是通信方式。
@@ -36,7 +35,7 @@ int socket(int domain, int type, int protocol);
 
 * **创建一个套接字**
 创建失败返回 -1
-```
+```c
 int server_sockfd;
 
 server_sockfd = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);//基于IPv4寻址、面向字节流的TCP套接字
@@ -45,7 +44,7 @@ server_sockfd = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);//基于IPv4寻址、�
 ## 确定ip地址、端口号等信息
 到这里，我们只是创建了fd，并没有告知ip地址和端口号等信息
 这里用到了一个结构体 ```sockaddr_in``` （对于 TCP/IPv4）
-```
+```c
 // /usr/include/netinet/in.h
 struct sockaddr_in
   {
@@ -62,7 +61,7 @@ struct sockaddr_in
 ```
 
 第一个成员是 ```sin_family ``` 无符号短整型，和 ```socket()``` 函数的第一个参数一样
-```
+```c
 // /usr/include/x86_64-linux-gnu/bits/sockaddr.h
 /* POSIX.1g specifies this type name for the `sa_family' member.  */
 typedef unsigned short int sa_family_t;
@@ -79,7 +78,7 @@ typedef unsigned short int sa_family_t;
 第二个成员是 ```sin_port``` 16位无符号短整型，保存端口号。
 第三个成员是 ```sin_addr``` 类型是 ```struct  in_addr ```
 结构体 ```struct  in_addr ``` 只有一个成员，32位无符号整形， 保存ip地址。
-```
+```c
 /* Internet address.  */
 typedef uint32_t in_addr_t;
 struct in_addr
@@ -92,7 +91,7 @@ struct in_addr
 > * 确定 ```struct sockaddr_in``` 信息
 
 网络字节序是大端格式，而主机字节序不一定（有的是小端，有的是大端）。```htons()``` 从主机字节序到网络字节序
-```
+```c
 struct sockaddr_in server_addr;
 bzero(&server_addr, sizeof(struct sockaddr_in)); // 置 0
 server_addr.sin_family = AF_INET;
@@ -102,14 +101,14 @@ server_addr.sin_addr.s_addr = INADDR_ANY; // 0x00000000
 ```
 ```inet_addr()```将点分十进制的ip地址转变为8位16进制的ip地址
 ```INADDR_ANY```定义：
-```
+```c
 // /usr/include/netinet/in.h
 #define INADDR_ANY              ((in_addr_t) 0x00000000)
 ```
 
 ## 绑定信息到描述符
 * 客户端不需要此操作
-```
+```c
 int bind(int fd, const struct sockaddr * addr, socklen_t addr_len)
 ```
 > * ```fd```描述符
@@ -119,7 +118,7 @@ int bind(int fd, const struct sockaddr * addr, socklen_t addr_len)
 
 
 ## 服务器监听
-```
+```c
 int listen(int fd, int n)
 ```
 > * ```fd```套接字
@@ -127,10 +126,10 @@ int listen(int fd, int n)
 监听成功返回```0```，监听失败返回```-1```
 
 ## 等待客户端
-```
+```c
 int accept(int fd, struct sockaddr * addr, socklen_t * addr_len)
 ```
-```
+```c
 int client_sockfd;
 client_sockfd = accept(server_sockfd, NULL, NULL);
 ```
@@ -138,10 +137,10 @@ client_sockfd = accept(server_sockfd, NULL, NULL);
 
 ## 客户端请求建立连接
 服务器没有请求连接一说
-```
+```c
 int connect(int fd, const struct sockaddr * addr, socklen_t addr_len);
 ```
-```
+```c
 struct sockaddr_in server_addr;
 bzero(&server_addr, sizeof(struct sockaddr_in));
 server_addr.sin_family = AF_INET;
@@ -154,13 +153,13 @@ connect(server_sockfd, (struct sockaddr*)&server_addr, sizeof(struct sockaddr_in
 ## 传输数据
 ```recv()``` 读取数据
 ```send()``` 发送数据
-```
+```c
 // 读取数据  对于服务器来说
 int buflen;
 char buf[BUF_SIZE];
 buflen = recv(client_sockfd, buf, BUF_SIZE, 0)
 ```
-```
+```c
 // 发送数据  对于客户端来说
 int buflen, retval;
 char buf[BUF_SIZE];
@@ -179,7 +178,7 @@ prorobuf的安装和使用参考我另一篇文章 [安装和使用protobuf](htt
 需要在服务器和客户端引入头文件 ```student.pb-c.h```
 
 关于protobuf在服务端的处理
-```
+```c
 Student *msg = NULL;
 int buflen;
 char buf[BUF_SIZE];
@@ -195,7 +194,7 @@ do {buflen = recv(client_sockfd, buf, BUF_SIZE, 0); // 收到就返回 哪怕一
 } while (strncasecmp(msg->name, "quit", 4) != 0);
 ```
 关于protobuf在客户端的处理
-```
+```c
 int retval;
 unsigned int len;
 void *buf = NULL;
@@ -225,7 +224,7 @@ do {
 
 先启动服务端
 后启动客户端
-```
+```c
 local address: 127.0.0.1
 lcoal port: 50338
 测试  # 这里是输入
@@ -233,7 +232,7 @@ send: 8
 ```
 
 服务端收到
-```
+```c
 msg name : 测试
 ```
 ---
